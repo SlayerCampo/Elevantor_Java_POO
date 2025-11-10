@@ -1,57 +1,50 @@
 public class Elevador {
-    private boolean puertasAbiertas;
     private int pisoActual;
+    private int totalPisos;
+    private Puertas puertas;
+    private Direccion direccion;
 
-    public Elevador() {
-        this.puertasAbiertas = false;
-        this.pisoActual = 1; // Siempre inicia en el primer piso
+    public Elevador(int totalPisos) {
+        this.totalPisos = totalPisos;
+        this.pisoActual = 1; // el ascensor siempre inicia en el primer piso
+        this.puertas = new Puertas();
+        this.direccion = Direccion.QUIETO;
     }
 
-    public void abrirPuertas() {
-        System.out.println("\n La puerta del ascensor se está abriendo...");
-        esperar(2000);
-        puertasAbiertas = true;
-        System.out.println(" Puertas completamente abiertas.");
-        preguntarEntrada();
+    public Puertas getPuertas() {
+        return puertas;
     }
 
-    private void preguntarEntrada() {
-        System.out.println("\n¿Desea entrar al ascensor? (si / no)");
-        java.util.Scanner input = new java.util.Scanner(System.in);
-        String respuesta = input.nextLine().toLowerCase();
+    public int getPisoActual() {
+        return pisoActual;
+    }
 
-        if (respuesta.equals("si")) {
-            System.out.println("🚶‍♂️ Entrando al ascensor...");
-            esperar(1500);
-            System.out.println(" Usted está dentro del ascensor.");
+    public void llamarAscensor(Pisos piso) {
+        System.out.println(" Botón presionado (" + piso.getNombreBoton() + ")");
+        System.out.println("Ascensor llegando al piso " + piso.getNumero() + "...");
+        piso.apagarBotones();
+    }
 
-
-
-
-            // En la siguiente fase vendrá la elección de piso
-        } else if (respuesta.equals("no")) {
-            System.out.println(" Esperando 10 segundos antes de cerrar...");
-            esperar(10000);
-            cerrarPuertas();
-        } else {
-            System.out.println(" Respuesta no válida. Intente de nuevo.");
-            preguntarEntrada();
+    public void moverA(int destino) {
+        if (destino == pisoActual) {
+            System.out.println("Ya estás en el piso " + destino);
+            return;
         }
-    }
 
-    public void cerrarPuertas() {
-        System.out.println("\n Ascensor cerrándose...");
-        esperar(2000);
-        puertasAbiertas = false;
-        System.out.println(" Puertas cerradas.");
-        System.out.println("\n Puede volver a 'oprimir boton para arriba' para llamar al ascensor nuevamente.");
-    }
+        direccion = destino > pisoActual ? Direccion.SUBIENDO : Direccion.BAJANDO;
+        System.out.println("🚪 Puertas cerradas.");
+        System.out.println(direccion == Direccion.SUBIENDO ? "⬆ Subiendo..." : "⬇ Bajando...");
 
-    private void esperar(int ms) {
-        try {
-            Thread.sleep(ms);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        int paso = direccion == Direccion.SUBIENDO ? 1 : -1;
+        while (pisoActual != destino) {
+            pisoActual += paso;
+            Display.mostrarPisoActual(pisoActual);
+            try {
+                Thread.sleep(1000); // velocidad de movimiento
+            } catch (InterruptedException e) {}
         }
+
+        System.out.println("📍 Llegaste al piso " + pisoActual + ".");
+        direccion = Direccion.QUIETO;
     }
 }

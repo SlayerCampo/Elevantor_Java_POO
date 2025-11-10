@@ -1,3 +1,3 @@
-public class Direccion {
-    
+public enum Direccion {
+    SUBIENDO, BAJANDO, QUIETO
 }
